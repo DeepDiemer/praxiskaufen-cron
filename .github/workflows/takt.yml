@@ -1,0 +1,18 @@
+name: Takt
+# Startet alle 30 Minuten den Lauf auf dem Webspace (Minute 7/37 UTC). Der Server-Schlüssel darf nur den Lauf starten (command=…,restrict).
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+jobs:
+  takt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lauf anstoßen
+        run: python3 run.py
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_TARGET: ${{ secrets.SSH_TARGET }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
