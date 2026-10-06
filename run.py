@@ -15,8 +15,10 @@ def main():
     key = os.environ.get("SSH_PRIVATE_KEY", "").replace("\\n", "\n").strip()
     target = os.environ.get("SSH_TARGET", "").strip()
     known = os.environ.get("SSH_KNOWN_HOSTS", "").replace("\\n", "\n").strip()
-    if "PRIVATE KEY" not in key or "@" not in target or not known:
-        print("Konfiguration fehlt (SSH_PRIVATE_KEY, SSH_TARGET, SSH_KNOWN_HOSTS)", file=sys.stderr)
+    missing = [name for name, ok in (("SSH_PRIVATE_KEY", "PRIVATE KEY" in key), ("SSH_TARGET", "@" in target),
+                                      ("SSH_KNOWN_HOSTS", bool(known))) if not ok]
+    if missing:
+        print("Konfiguration fehlt oder ungültig: " + ", ".join(missing), file=sys.stderr)
         return 2
     with tempfile.TemporaryDirectory() as d:
         kp, kh = os.path.join(d, "id"), os.path.join(d, "known_hosts")
